@@ -18,7 +18,7 @@ function App() {
       <NavbarComp/>
     <Routes>
       <Route path='/' element={<CinemaList movies={movies} onDelete={deleteMovie}/>}/>
-      <Route path='/new%movie' element={<NewMovie onAddMovie={addMovie}/>}/>
+      <Route path='/new-movie' element={<NewMovie onAddMovie={addMovie}/>}/>
       <Route path='/movie/:id' element={<MovieDetail movies={movies} />}/>
     </Routes>
     </BrowserRouter>

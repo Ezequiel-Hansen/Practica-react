@@ -1,4 +1,3 @@
-import React from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
@@ -13,7 +12,7 @@ function CinemaList({ movies, onDelete }) {
       <Row className="g-4">
         {movies.map((movie) => (
           <Col key={movie.id} xs={12} sm={6} md={4} lg={3}>
-            <CardMovie {...movie} onOpenModal={()=> setMovieDelete(movie.id)}/>
+            <CardMovie {...movie} onDelete={onDelete} />
           </Col>
         ))}
       </Row>

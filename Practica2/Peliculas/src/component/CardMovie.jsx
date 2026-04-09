@@ -1,10 +1,11 @@
-import React from 'react';
 import { Link } from 'react-router-dom'
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Badge from 'react-bootstrap/Badge';
-
-function CardMovie({id, title, poster, duration, sinopsis, rating, onOpenModal }) {
+import { Modal } from 'react-bootstrap';
+import { useState } from 'react';
+function CardMovie({id, title, poster, duration, sinopsis, rating, onDelete }) {
+  const [showModal, setShowModal] = useState(false);
 
   const getRatingColor = (ratingString) => {
     if (!ratingString) return 'success';
@@ -13,11 +14,25 @@ function CardMovie({id, title, poster, duration, sinopsis, rating, onOpenModal }
 
     if (match) {
       const age = parseInt(match[0], 10);
-      return age >= 18 ? 'danger' : 'success';
+      switch (true) {
+        case age < 13:
+          return 'success';
+        case age < 18:
+          return 'warning';
+        default:
+          return 'danger';
+      }
     }
-
     return 'success';
   };
+
+  const handleCloseModal = () => setShowModal(false);
+  const handleShowModal = () => setShowModal(true);
+  const handleModalDelete = () => {
+    onDelete(id);
+    handleCloseModal();
+  }
+
 
   return (
     <Card className="h-100 shadow-sm">
@@ -43,7 +58,23 @@ function CardMovie({id, title, poster, duration, sinopsis, rating, onOpenModal }
           <Button as={Link} to={`/movie/${id}`} variant="warning">
             Ver detalles
           </Button>
-          <Button variant="danger">Eliminar</Button>
+          <Button variant="danger" onClick={handleShowModal}>
+            Eliminar
+          </Button>
+          <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>¿Estas Seguro?</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>¿Quieres eliminar la pelicula "{title}"?</Modal.Body>
+        <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseModal}>
+              Cancelar
+            </Button>
+            <Button variant="danger" onClick={handleModalDelete}>
+            Eliminar Definitivamente
+          </Button>
+        </Modal.Footer>
+      </Modal>
         </div>
 
       </Card.Body>
