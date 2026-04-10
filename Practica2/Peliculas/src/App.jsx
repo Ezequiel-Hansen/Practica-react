@@ -11,7 +11,13 @@ function App() {
   const [movies,setMovies]=useState(initialMovies)
   const deleteMovie= (id)=> setMovies(movies.filter(e=> e.id!==id))
   const addMovie = (newMovie) => {
-    setMovies([...movies, newMovie]);
+    const movieRepeated= movies.find(movie => movie.title.toLowerCase() === newMovie.title.toLowerCase());
+    if (movieRepeated) {
+      alert("La película ya existe en la lista.");
+      return;
+    }else {      
+      setMovies([...movies, newMovie]);
+    }
   };
   return (
     <BrowserRouter>

@@ -55,8 +55,8 @@ const NewMovie = ({ onAddMovie }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (!formMovie.title || !formMovie.poster) {
-            alert("Por favor completa al menos el título y el póster.");
+        if (!formMovie.title || !formMovie.poster || !formMovie.date || !formMovie.time || formMovie.cinemas.length === 0 || !formMovie.rating || !formMovie.duration || !formMovie.director || !formMovie.synopsis) {
+            alert("Por favor completa todos los campos obligatorios.");
             return;
         }
 
