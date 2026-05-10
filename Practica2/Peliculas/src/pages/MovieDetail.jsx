@@ -1,5 +1,6 @@
-import { useParams } from 'react-router-dom';
-import { Container, Row, Col, Badge } from 'react-bootstrap';
+import { useParams, Link } from 'react-router-dom';
+import { Container, Row, Col, Badge, Button } from 'react-bootstrap';
+
 
 const MovieDetail = ({ movies }) => {
   const getRatingColor = (ratingString) => {
@@ -26,6 +27,9 @@ const MovieDetail = ({ movies }) => {
 
   return (
     <Container className="mt-5">
+      <Link to ={`/edit/${id}`}>
+      <Button variant="warning">Edit</Button>
+      </Link>
       <Row>
         <Col md={4}>
           <img src={movie.poster} alt={movie.title} className="img-fluid rounded shadow" />

@@ -3,8 +3,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Card from 'react-bootstrap/Card';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
+
 
 
 const listCinemas = [
@@ -66,28 +65,13 @@ const NewMovie = ({ onAddMovie }) => {
         };
 
         onAddMovie(newMovie);
-
-        setformMovie({
-            title: '',
-            poster: '',
-            duration: '',
-            rating: '',
-            synopsis: '',
-            director: '',
-            cinemas: [],
-            time: '',
-            date: ''
-        });
     };
 
-    const handleDateChange = (date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate())
-        const formattedDate = `${year}-${month}-${day}`;
+    const handleDateChange = (e) => {
+        const {value}=e.target
         setformMovie({
             ...formMovie,
-            date: formattedDate
+            date:value
         });
     }
     return (
@@ -180,8 +164,17 @@ const NewMovie = ({ onAddMovie }) => {
                                 </Form.Group>
                             </div>
                             <div className="col-md-6">
-                                    <Form.Label><strong>Fecha:</strong></Form.Label>
-                                    <Calendar onChange={handleDateChange} value={formMovie.date} />
+                                <Form.Label><strong>Fecha:</strong></Form.Label>
+                                <Form.Group className="mb-3" controlId="formDate">
+                                    <Form.Control
+                                        type="date"
+                                        name="date"
+                                        value={formMovie.date}
+                                        onChange={handleDateChange}
+                                        required
+                                    />
+                                </Form.Group>
+
                             </div>
                             <div className="col-md-6">
                                 <Form.Group className="mb-3">
