@@ -3,8 +3,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Card from 'react-bootstrap/Card';
-
-
+import { createMovie } from '../data/fetch.js'
 
 const listCinemas = [
     "Cinemark Hoyts",
@@ -51,7 +50,7 @@ const NewMovie = ({ onAddMovie }) => {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!formMovie.title || !formMovie.poster || !formMovie.date || !formMovie.time || formMovie.cinemas.length === 0 || !formMovie.rating || !formMovie.duration || !formMovie.director || !formMovie.synopsis) {
@@ -59,12 +58,30 @@ const NewMovie = ({ onAddMovie }) => {
             return;
         }
 
-        const newMovie = {
-            ...formMovie,
-            id: Date.now()
+        const payload = {
+            title: formMovie.title,
+            director: formMovie.director,
+            duration: formMovie.duration,
+            rating: formMovie.rating,
+            poster: formMovie.poster,
+            synopsis: formMovie.synopsis,
+            cinemas: formMovie.cinemas.map(name => ({
+                name,
+                date: formMovie.date,
+                time: formMovie.time,
+            })),
         };
-
-        onAddMovie(newMovie);
+                try {
+            const newMovie = await createMovie(payload);
+            onAddMovie(newMovie); 
+            setformMovie({
+                title: '', poster: '', duration: '',
+                rating: '', synopsis: '', director: '',
+                cinemas: [], time: '', date: ''
+            });
+        } catch (err) {
+            console.log(err.message);
+        }
     };
 
     const handleDateChange = (e) => {

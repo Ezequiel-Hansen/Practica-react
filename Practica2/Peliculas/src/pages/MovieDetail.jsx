@@ -1,8 +1,10 @@
 import { useParams, Link } from 'react-router-dom';
+import {getMovieById} from '../data/fetch.js'
+import { useEffect, useState } from 'react';
 import { Container, Row, Col, Badge, Button } from 'react-bootstrap';
 
 
-const MovieDetail = ({ movies }) => {
+const MovieDetail = () => {
   const getRatingColor = (ratingString) => {
     if (!ratingString) return 'success';
 
@@ -23,7 +25,21 @@ const MovieDetail = ({ movies }) => {
     return 'success';
   };
   const { id } = useParams();
-  const movie = movies.find(m => m.id.toString() === id);
+  const [movie, setMovie] = useState(null);
+
+
+  useEffect(() => {
+    const fetchMovie = async () => {
+      try {
+        const data = await getMovieById(id);
+        setMovie(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchMovie();
+  }, [id]);
+   if (!movie) return <p>Cargando...</p>;
 
   return (
     <Container className="mt-5">
@@ -41,7 +57,7 @@ const MovieDetail = ({ movies }) => {
           <p><strong>Duración:</strong> {movie.duration}</p>
           <p><strong>Fecha de estreno:</strong> {movie.date}</p>
           <p><strong>Hora:</strong> {movie.time}</p>
-          <p><strong>En cines disponibles:</strong> {movie.cinemas.join(', ')}</p>
+          <p><strong>En cines disponibles:</strong> {movie.screenings.map((e)=> e.cinema.name).join(', ')}</p>
           <hr />
           <h3>Sinopsis</h3>
           <p>{movie.synopsis}</p>

@@ -2,69 +2,97 @@ import { useState, useEffect } from 'react';
 import { Card, Container, Form, Button } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
 import { ModalError } from '../component/ModalError';
+import { getMovieById, updateMovie } from '../data/fetch.js';
 
 const listCinemas = [
     "Cinemark Hoyts", "Nuevo Monumental", "ShowCase Rosario",
-    "Cines del centro", "Las Tipas", "Cine “El Cairo”"
+    "Cines del centro", "Las Tipas", "Cine", "El Cairo"
 ];
 
-export const MovieEdit = ({ movies, onEditMovie }) => {
+export const MovieEdit = () => {  // ← ya no necesita recibir props
     const { id } = useParams();
     const navigate = useNavigate();
-    const [movieNotFound, setMovieNotFound] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
-    const [formMovie, setformMovie] = useState({
-        id: '', title: '', poster: '', duration: '',
+    const [formMovie, setFormMovie] = useState({
+        title: '', poster: '', duration: '',
         rating: '', synopsis: '', director: '',
         cinemas: [], time: '', date: ''
     });
 
+    // Precarga desde el backend
+    useEffect(() => {
+        const fetchMovie = async () => {
+            try {
+                const data = await getMovieById(id);
+                setFormMovie({
+                    title: data.title,
+                    poster: data.poster_url,
+                    duration: data.duration,
+                    rating: data.rating,
+                    synopsis: data.synopsis,
+                    director: data.director,
+                    cinemas: data.screenings?.map(s => s.cinema.name) ?? [],
+                    time: data.screenings?.[0]?.screening_time ?? '',
+                    date: data.screenings?.[0]?.screening_date ?? '',
+                });
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-useEffect(() => {
-    const movie = movies.find(m => m.id.toString() === id);
-
-    if (movie) {
-        setformMovie(prev => ({
-            ...prev,
-            ...movie,
-            cinemas: movie.cinemas || []
-        }));
-    } else if (movies.length > 0) {
-        setMovieNotFound(true);
-    }
-}, [id, movies]);
-
-if (movieNotFound) {
-    return <Container className="mt-4"><h2>Película no encontrada</h2></Container>;
-}
+        fetchMovie();
+    }, [id]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setformMovie(prev => ({ ...prev, [name]: value }));
+        setFormMovie(prev => ({ ...prev, [name]: value }));
     };
 
     const handleCheckboxCinema = (e) => {
         const { value, checked } = e.target;
-        setformMovie(prev => ({
+        setFormMovie(prev => ({
             ...prev,
-            cinemas: checked 
-                ? [...prev.cinemas, value] 
-                : prev.cinemas.filter(cine => cine !== value)
+            cinemas: checked
+                ? [...prev.cinemas, value]
+                : prev.cinemas.filter(c => c !== value)
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const isInvalid = Object.values(formMovie).some(val => val === '' || (Array.isArray(val) && val.length === 0));
-        
+        const isInvalid = Object.values(formMovie).some(
+            val => val === '' || (Array.isArray(val) && val.length === 0)
+        );
         if (isInvalid) {
             setShowModal(true);
             return;
         }
 
-        onEditMovie(formMovie);
+        try {
+            await updateMovie(id, {
+                title: formMovie.title,
+                director: formMovie.director,
+                duration: formMovie.duration,
+                rating: formMovie.rating,
+                poster: formMovie.poster,
+                synopsis: formMovie.synopsis,
+                cinemas: formMovie.cinemas.map(name => ({
+                    name,
+                    date: formMovie.date,
+                    time: formMovie.time,
+                })),
+            });
+            navigate(-1);
+        } catch (error) {
+            console.error(error);
+        }
     };
+
+    if (loading) return <Container className="mt-4"><p>Cargando...</p></Container>;
 
     return (
         <>

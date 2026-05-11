@@ -1,8 +1,9 @@
 import {Route, Routes, useNavigate} from 'react-router-dom'
 import CinemaList from './pages/CinemaList'
 import MovieDetail from './pages/MovieDetail'
-import {initialMovies} from './data/movies.js'
-import { useState } from 'react'
+//import {initialMovies} from './data/movies.js'
+import {getMovies} from './data/fetch.js'
+import { useState, useEffect } from 'react'
 import './App.css'
 import NavbarComp from './component/NavBar.jsx'
 import NewMovie from './pages/NewMovie.jsx'
@@ -10,7 +11,7 @@ import { MovieEdit } from './pages/MovieEdit.jsx'
 
 function App() {
   const navigate= useNavigate()
-  const [movies,setMovies]=useState(initialMovies)
+  const [movies,setMovies]=useState([])
   const deleteMovie= (id)=> setMovies(movies.filter(e=> e.id!==id))
   const addMovie = (newMovie) => {
     const movieRepeated= movies.find(movie => movie.title.toLowerCase() === newMovie.title.toLowerCase());
@@ -29,14 +30,27 @@ const handleEditMovie = (updatedMovie) => {
     );
     navigate('/');
 };
+useEffect(() => {
+  const fetchMovies = async () => {
+    try {
+      const data = await getMovies();
+      setMovies(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  fetchMovies();
+}, []);
+
   return (
     <>
       <NavbarComp/>
     <Routes>
       <Route path='/' element={<CinemaList movies={movies} onDelete={deleteMovie}/>}/>
       <Route path='/new-movie' element={<NewMovie onAddMovie={addMovie}/>}/>
-      <Route path='/movie/:id' element={<MovieDetail movies={movies} />}/>
-      <Route path='/edit/:id' element={<MovieEdit movies={movies} onEditMovie={handleEditMovie}/>}/>
+      <Route path='/movie/:id' element={<MovieDetail/>}/>
+      <Route path='/edit/:id' element={<MovieEdit onEditMovie={handleEditMovie}/>}/>
     </Routes>
     </>
   )
