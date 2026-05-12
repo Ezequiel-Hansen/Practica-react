@@ -25,22 +25,24 @@ const MovieDetail = () => {
     return 'success';
   };
   const { id } = useParams();
-  const [movie, setMovie] = useState(null);
-
+  const [movie, setMovie] = useState();
 
   useEffect(() => {
     const fetchMovie = async () => {
       try {
         const data = await getMovieById(id);
         setMovie(data);
+        document.title=data.title
       } catch (error) {
         console.error(error);
       }
     };
     fetchMovie();
+    return ()=>{
+      document.title="CineRosCity"
+    }
   }, [id]);
-   if (!movie) return <p>Cargando...</p>;
-
+  if (!movie) return <p>Cargando...</p>; // 
   return (
     <Container className="mt-5">
       <Link to ={`/edit/${id}`}>
